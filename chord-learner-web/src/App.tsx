@@ -3,16 +3,36 @@ import { useState, useEffect, useRef } from 'react';
 import { MetronomeEngine } from './MetronomeEngine';
 import './index.css';
 
-const ALL_CHORDS = ['C', 'C7', 'd', 'D', 'e', 'E', 'F', 'G', 'G7', 'a', 'A', 'A7', 'H', 'B'];
+const ALL_CHORDS = [
+  'C', 'c', 'C7', 'Csus4',
+  'C#', 'c#', 'C#7', 'C#sus4',
+  'D', 'd', 'D7', 'Dsus4',
+  'D#', 'd#', 'D#7', 'D#sus4',
+  'E', 'e', 'E7', 'Esus4',
+  'F', 'f', 'F7', 'Fsus4',
+  'F#', 'f#', 'F#7', 'F#sus4',
+  'G', 'g', 'G7', 'Gsus4',
+  'G#', 'g#', 'G#7', 'G#sus4',
+  'A', 'a', 'A7', 'Asus4',
+  'A#', 'a#', 'A#7', 'A#sus4',
+  'H', 'h', 'H7', 'Hsus4',
+  'B', 'b', 'B7', 'Bsus4'
+];
 
 function App() {
   const [bpm, setBpm] = useState(100);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeBeat, setActiveBeat] = useState(-1);
   const [selectedChords, setSelectedChords] = useState<string[]>(['C', 'G', 'a', 'F']);
-  const [displayedChord, setDisplayedChord] = useState<string>('Wybierz akordy i kliknij Start');
+  
+  const [displayedChord, setDisplayedChord] = useState<string>('GOTOWY?');
+  const [displayedNextChord, setDisplayedNextChord] = useState<string>('');
   
   const metronomeRef = useRef<MetronomeEngine>(new MetronomeEngine());
+  
+  const nextChordRef = useRef<string>('');
+
+  const getRandomChord = (chords: string[]) => chords[Math.floor(Math.random() * chords.length)];
 
   useEffect(() => {
     const metronome = metronomeRef.current;
@@ -21,8 +41,11 @@ function App() {
       setActiveBeat(beat);
       
       if (beat === 0 && selectedChords.length > 0) {
-        const randomChord = selectedChords[Math.floor(Math.random() * selectedChords.length)];
-        setDisplayedChord(randomChord);
+        setDisplayedChord(nextChordRef.current);
+        
+        const newNext = getRandomChord(selectedChords);
+        setDisplayedNextChord(newNext);
+        nextChordRef.current = newNext; 
       }
     };
 
@@ -34,7 +57,18 @@ function App() {
     if (isPlaying) {
       metronome.stop();
       setActiveBeat(-1);
+      setDisplayedNextChord(''); 
+      setDisplayedChord('GOTOWY?');
     } else {
+      if (selectedChords.length > 0) {
+        const first = getRandomChord(selectedChords);
+        const second = getRandomChord(selectedChords);
+        
+        setDisplayedChord(first);
+        setDisplayedNextChord(second);
+        nextChordRef.current = second;
+      }
+      
       metronome.setBPM(bpm);
       metronome.start();
     }
@@ -57,11 +91,21 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Ćwiczenie Akordów</h1>
+      <h1>Szkoła akordeonu im. Zapałki</h1>
 
-      {/* Ekran głównego akordu */}
-      <div className="chord-display">
-        {isPlaying ? displayedChord : "GOTOWY?"}
+      {/* Scena z Akordami (Główny i Następny) */}
+      <div className="chord-stage">
+        <div className="chord-display">
+          {displayedChord}
+        </div>
+        
+        {/* Renderujemy "Następny" tylko jeśli gra metronom i są wybrane akordy */}
+        {isPlaying && selectedChords.length > 0 && (
+          <div className="chord-next">
+            <span className="chord-next-label">Następny: </span>
+            <span className="chord-next-value">{displayedNextChord}</span>
+          </div>
+        )}
       </div>
 
       {/* Sygnalizator uderzeń (4 kropki) */}
@@ -85,7 +129,7 @@ function App() {
 
       {/* Wybór Akordów */}
       <div className="chord-selector">
-        <h3>Wybierz akordy do dzisiejszego treningu:</h3>
+        <h3>Wybierz akordy:</h3>
         <div className="chord-grid">
           {ALL_CHORDS.map(chord => (
             <button

@@ -31,10 +31,10 @@ export interface ChordInfo {
     return `Palec 1 na ${rootName}, palec 2 lub 3 na kwarcie czystej, palec 5 na kwincie`;
   }
   
-  function descMaj(r: string) { return `Akord durowy — brzmi radośnie i jasno. Podstawa harmonii klasycznej.`; }
-  function descMin(r: string) { return `Akord molowy — brzmi melancholijnie i poważnie.`; }
-  function desc7(r: string)   { return `Dominantoseptymowy — napięty, prowadzi do rozwiązania. Często w bluesie i jazzie.`; }
-  function descSus4(r: string){ return `Suspended 4 — kwarta zamiast tercji, brzmi zawieszono i nowoczesnie.`; }
+  function descMaj() { return `Akord durowy — brzmi radośnie i jasno. Podstawa harmonii klasycznej.`; }
+  function descMin() { return `Akord molowy — brzmi melancholijnie i poważnie.`; }
+  function desc7()   { return `Dominantoseptymowy — napięty, prowadzi do rozwiązania. Często w bluesie i jazzie.`; }
+  function descSus4(){ return `Suspended 4 — kwarta zamiast tercji, brzmi zawieszono i nowoczesnie.`; }
   
   export const CHORD_DATA: Record<string, ChordInfo> = {};
   
@@ -46,17 +46,17 @@ export interface ChordInfo {
   for (const [key, root] of Object.entries(roots)) {
     const rName = noteNames[key] ?? key;
   
-    CHORD_DATA[key]         = { notes: chord(root, MAJ),  fingers: fingeringMaj(rName), description: descMaj(rName) };
-    CHORD_DATA[key.toLowerCase()] = { notes: chord(root, MIN),  fingers: fingeringMin(rName), description: descMin(rName) };
-    CHORD_DATA[`${key}7`]   = { notes: chord(root, DOM7), fingers: fingering7(rName),   description: desc7(rName)   };
-    CHORD_DATA[`${key}sus4`]= { notes: chord(root, SUS4), fingers: fingeringSus4(rName),description: descSus4(rName)};
+    CHORD_DATA[key]         = { notes: chord(root, MAJ),  fingers: fingeringMaj(rName), description: descMaj() };
+    CHORD_DATA[key.toLowerCase()] = { notes: chord(root, MIN),  fingers: fingeringMin(rName), description: descMin() };
+    CHORD_DATA[`${key}7`]   = { notes: chord(root, DOM7), fingers: fingering7(rName),   description: desc7()   };
+    CHORD_DATA[`${key}sus4`]= { notes: chord(root, SUS4), fingers: fingeringSus4(rName),description: descSus4()};
   }
   
   for (const key of ['C#','D#','F#','G#','A#']) {
     CHORD_DATA[`${key.toLowerCase()}`] = { ...CHORD_DATA[key.toLowerCase()] ?? CHORD_DATA[key] };
     const root = roots[key];
-    CHORD_DATA[`${key.toLowerCase()}`] = { notes: chord(root, MIN), fingers: fingeringMin(key), description: descMin(key) };
+    CHORD_DATA[`${key.toLowerCase()}`] = { notes: chord(root, MIN), fingers: fingeringMin(key), description: descMin() };
   }
   
-  CHORD_DATA['Hsus4'] = CHORD_DATA['Bsus4'] ?? { notes: chord(11, SUS4), fingers: fingeringSus4('H/B'), description: descSus4('H/B') };
-  CHORD_DATA['hsus4'] = { notes: chord(11, SUS4), fingers: fingeringSus4('H/B'), description: descSus4('H/B') };
+  CHORD_DATA['Hsus4'] = CHORD_DATA['Bsus4'] ?? { notes: chord(11, SUS4), fingers: fingeringSus4('H/B'), description: descSus4() };
+  CHORD_DATA['hsus4'] = { notes: chord(11, SUS4), fingers: fingeringSus4('H/B'), description: descSus4() };

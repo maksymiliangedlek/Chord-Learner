@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MetronomeEngine } from './MetronomeEngine';
-import { CHORD_DATA } from './chordData';
-import { PianoKeyboard } from './PianoKeyboard';
+import { CHORD_DATA } from './Chorddata';
+import { PianoKeyboard } from './Pianokeyboard';
 import { DrunkBpmPicker } from './DrunkBpmPicker';
 import './index.css';
 

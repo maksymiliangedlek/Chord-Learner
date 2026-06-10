@@ -3,9 +3,7 @@ export interface ChordInfo {
     fingers: string;        // opis palcowania
     description: string;    // czym jest ten akord
   }
-  
-  const n = (semitones: number[]) => semitones; // alias
-  
+    
   function chord(root: number, intervals: number[]): number[] {
     return intervals.map(i => root + i);
   }

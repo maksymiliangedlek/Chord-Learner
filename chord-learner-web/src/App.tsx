@@ -155,6 +155,7 @@ function App() {
         </button>
       </div>
 
+
       {/* Wybór akordów */}
       <div className="chord-selector">
         <h3>Wybierz akordy ({selectedChords.length})</h3>

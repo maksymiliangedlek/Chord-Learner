@@ -242,11 +242,11 @@ function App() {
 
                   <div className="learn-info-cards">
                     <div className="learn-info-card">
-                      <span className="learn-info-label">✋ Palcowanie</span>
+                      <span className="learn-info-label">Palcowanie</span>
                       <p className="learn-info-text">{learnInfo.fingers}</p>
                     </div>
                     <div className="learn-info-card">
-                      <span className="learn-info-label">ℹ️ Opis</span>
+                      <span className="learn-info-label">Opis</span>
                       <p className="learn-info-text">{learnInfo.description}</p>
                     </div>
                   </div>

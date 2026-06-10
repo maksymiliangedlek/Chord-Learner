@@ -1,4 +1,3 @@
-// src/App.tsx
 import { useState, useEffect, useRef } from 'react';
 import { MetronomeEngine } from './MetronomeEngine';
 import './index.css';

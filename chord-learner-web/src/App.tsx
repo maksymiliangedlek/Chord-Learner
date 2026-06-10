@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { MetronomeEngine } from './MetronomeEngine';
 import { CHORD_DATA } from './chordData';
 import { PianoKeyboard } from './PianoKeyboard';
+import { DrunkBpmPicker } from './DrunkBpmPicker';
 import './index.css';
 
 const ALL_CHORDS = [
@@ -24,8 +25,8 @@ type Mode = 'practice' | 'learn';
 
 function App() {
   const [mode, setMode] = useState<Mode>('practice');
+  const [drunkMode, setDrunkMode] = useState(true);
 
-  // --- Tryb Praktyki ---
   const [bpm, setBpm] = useState(100);
   const [bpmInput, setBpmInput] = useState('100');
   const [isPlaying, setIsPlaying] = useState(false);
@@ -35,7 +36,6 @@ function App() {
   const [displayedNextChord, setDisplayedNextChord] = useState<string>('');
   const [isChanging, setIsChanging] = useState(false);
 
-  // --- Tryb Nauki ---
   const [learnSelected, setLearnSelected] = useState<string | null>(null);
 
   const metronomeRef = useRef<MetronomeEngine>(new MetronomeEngine());
@@ -59,7 +59,6 @@ function App() {
     return () => metronome.stop();
   }, [selectedChords]);
 
-  // Zatrzymaj metronom przy zmianie trybu
   useEffect(() => {
     if (mode === 'learn' && isPlaying) {
       metronomeRef.current.stop();
@@ -118,6 +117,19 @@ function App() {
     <div className="container">
       <h1>Szkoła Akordeonu im. Zapałki</h1>
 
+      <div className="drunk-mode-toggle">
+        <span className="drunk-mode-label">Drunk mode</span>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={drunkMode}
+          className={`toggle-switch${drunkMode ? ' on' : ''}`}
+          onClick={() => setDrunkMode(v => !v)}
+        >
+          <span className="toggle-knob" />
+        </button>
+      </div>
+
       {/* Przełącznik trybów */}
       <div className="mode-switcher">
         <button
@@ -159,22 +171,33 @@ function App() {
           </div>
 
           <div className="controls">
-            <div className="bpm-slider-container">
-              <div className="bpm-label-row">
-                <label>Tempo</label>
-                <input
-                  type="number"
-                  className="bpm-input"
-                  min={40}
-                  max={220}
-                  value={bpmInput}
-                  onChange={handleBpmInput}
-                  onBlur={handleBpmBlur}
-                  onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
-                />
+            {drunkMode ? (
+              <DrunkBpmPicker
+                bpm={bpm}
+                onBpmChange={(val) => {
+                  setBpm(val);
+                  setBpmInput(String(val));
+                  metronomeRef.current.setBPM(val);
+                }}
+              />
+            ) : (
+              <div className="bpm-slider-container">
+                <div className="bpm-label-row">
+                  <label>Tempo</label>
+                  <input
+                    type="number"
+                    className="bpm-input"
+                    min={40}
+                    max={220}
+                    value={bpmInput}
+                    onChange={handleBpmInput}
+                    onBlur={handleBpmBlur}
+                    onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
+                  />
+                </div>
+                <input type="range" min="40" max="220" value={bpm} onChange={handleSliderChange} />
               </div>
-              <input type="range" min="40" max="220" value={bpm} onChange={handleSliderChange} />
-            </div>
+            )}
             <button className={`play-btn ${isPlaying ? 'stop' : 'start'}`} onClick={togglePlay}>
               {isPlaying ? 'Stop' : 'Start'}
             </button>

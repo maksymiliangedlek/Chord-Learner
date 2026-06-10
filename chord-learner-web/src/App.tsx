@@ -23,32 +23,36 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeBeat, setActiveBeat] = useState(-1);
   const [selectedChords, setSelectedChords] = useState<string[]>(['C', 'G', 'a', 'F']);
-  
-  const [displayedChord, setDisplayedChord] = useState<string>('GOTOWY?');
+  const [bpmInput, setBpmInput] = useState('100');
+
+  const [displayedChord, setDisplayedChord] = useState<string>('—');
   const [displayedNextChord, setDisplayedNextChord] = useState<string>('');
-  
+  const [isChanging, setIsChanging] = useState(false);
+
   const metronomeRef = useRef<MetronomeEngine>(new MetronomeEngine());
-  
   const nextChordRef = useRef<string>('');
 
   const getRandomChord = (chords: string[]) => chords[Math.floor(Math.random() * chords.length)];
 
   useEffect(() => {
     const metronome = metronomeRef.current;
-    
+
     metronome.onBeat = (beat) => {
       setActiveBeat(beat);
-      
+
       if (beat === 0 && selectedChords.length > 0) {
+        // Krótka animacja — scale bounce na karcie
+        setIsChanging(true);
+        setTimeout(() => setIsChanging(false), 150);
+
         setDisplayedChord(nextChordRef.current);
-        
         const newNext = getRandomChord(selectedChords);
         setDisplayedNextChord(newNext);
-        nextChordRef.current = newNext; 
+        nextChordRef.current = newNext;
       }
     };
 
-    return () => metronome.stop(); 
+    return () => metronome.stop();
   }, [selectedChords]);
 
   const togglePlay = () => {
@@ -56,84 +60,109 @@ function App() {
     if (isPlaying) {
       metronome.stop();
       setActiveBeat(-1);
-      setDisplayedNextChord(''); 
-      setDisplayedChord('GOTOWY?');
+      setDisplayedNextChord('');
+      setDisplayedChord('—');
     } else {
       if (selectedChords.length > 0) {
         const first = getRandomChord(selectedChords);
         const second = getRandomChord(selectedChords);
-        
         setDisplayedChord(first);
         setDisplayedNextChord(second);
         nextChordRef.current = second;
       }
-      
       metronome.setBPM(bpm);
       metronome.start();
     }
     setIsPlaying(!isPlaying);
   };
 
-  const handleBpmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newBpm = Number(e.target.value);
-    setBpm(newBpm);
-    metronomeRef.current.setBPM(newBpm);
+  const handleBpmInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBpmInput(e.target.value);
+  };
+  
+  const handleBpmBlur = () => {
+    const raw = parseInt(bpmInput, 10);
+    const clamped = isNaN(raw) ? 40 : Math.min(220, Math.max(40, raw));
+    setBpm(clamped);
+    setBpmInput(String(clamped));
+    metronomeRef.current.setBPM(clamped);
+  };
+  
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Number(e.target.value);
+    setBpm(val);
+    setBpmInput(String(val));
+    metronomeRef.current.setBPM(val);
   };
 
   const toggleChord = (chord: string) => {
-    setSelectedChords(prev => 
-      prev.includes(chord) 
-        ? prev.filter(c => c !== chord) 
+    setSelectedChords(prev =>
+      prev.includes(chord)
+        ? prev.filter(c => c !== chord)
         : [...prev, chord]
     );
   };
 
   return (
     <div className="container">
-      <h1>Szkoła akordeonu im. Zapałki</h1>
+      <h1>Szkoła Akordeonu im. Zapałki</h1>
 
-      {/* Scena z Akordami (Główny i Następny) */}
+      {/* Scena z akordami */}
       <div className="chord-stage">
-        <div className="chord-display">
+        <div className={`chord-display${isChanging ? ' changing' : ''}`}>
           {displayedChord}
         </div>
-        
-        {/* Renderujemy "Następny" tylko jeśli gra metronom i są wybrane akordy */}
+
         {isPlaying && selectedChords.length > 0 && (
-          <div className="chord-next">
-            <span className="chord-next-label">Następny: </span>
+          /* key powoduje re-mount przy każdej zmianie → animation fadeSlideIn odpala się świeżo */
+          <div className="chord-next" key={displayedNextChord}>
+            <span className="chord-next-label">Następny</span>
             <span className="chord-next-value">{displayedNextChord}</span>
           </div>
         )}
       </div>
 
-      {/* Sygnalizator uderzeń (4 kropki) */}
+      {/* Wskaźnik uderzeń */}
       <div className="beats-indicator">
         {[0, 1, 2, 3].map(i => (
-          <div key={i} className={`beat-dot ${activeBeat === i ? 'active' : ''} ${i === 0 ? 'accent' : ''}`} />
+          <div
+            key={i}
+            className={`beat-dot${activeBeat === i ? ' active' : ''}${i === 0 ? ' accent' : ''}`}
+          />
         ))}
       </div>
 
-      {/* Kontrolki Metronomu */}
+      {/* Kontrolki */}
       <div className="controls">
         <div className="bpm-slider-container">
-          <label>Tempo: <strong>{bpm} BPM</strong></label>
-          <input type="range" min="40" max="220" value={bpm} onChange={handleBpmChange} />
+          <div className="bpm-label-row">
+            <label>Tempo</label>
+            <input
+              type="number"
+              className="bpm-input"
+              min={40}
+              max={220}
+              value={bpmInput}
+              onChange={handleBpmInput}
+              onBlur={handleBpmBlur}
+              onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
+            />
+          </div>
+          <input type="range" min="40" max="220" value={bpm} onChange={handleSliderChange} />
         </div>
-
         <button className={`play-btn ${isPlaying ? 'stop' : 'start'}`} onClick={togglePlay}>
-          {isPlaying ? 'STOP' : 'START METRONOMU'}
+          {isPlaying ? 'Stop' : 'Start'}
         </button>
       </div>
 
-      {/* Wybór Akordów */}
+      {/* Wybór akordów */}
       <div className="chord-selector">
-        <h3>Wybierz akordy:</h3>
+        <h3>Wybierz akordy ({selectedChords.length})</h3>
         <div className="chord-grid">
           {ALL_CHORDS.map(chord => (
             <button
               key={chord}
-              className={`chord-btn ${selectedChords.includes(chord) ? 'selected' : ''}`}
+              className={`chord-btn${selectedChords.includes(chord) ? ' selected' : ''}`}
               onClick={() => toggleChord(chord)}
             >
               {chord}

@@ -18,6 +18,8 @@ export interface ChordInfo {
   const DOM7  = [0, 4, 7, 10];
   const SUS4  = [0, 5, 7];
   
+
+  
   function fingeringMaj(rootName: string) {
     return `Palec 1 (kciuk) na ${rootName}, palec 3 (środkowy) na tercji wielkiej, palec 5 (mały) na kwincie`;
   }

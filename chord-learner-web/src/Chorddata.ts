@@ -19,7 +19,7 @@ export interface ChordInfo {
   const SUS4  = [0, 5, 7];
   
 
-  
+
   function fingeringMaj(rootName: string) {
     return `Palec 1 (kciuk) na ${rootName}, palec 3 (środkowy) na tercji wielkiej, palec 5 (mały) na kwincie`;
   }
@@ -32,6 +32,7 @@ export interface ChordInfo {
   function fingeringSus4(rootName: string) {
     return `Palec 1 na ${rootName}, palec 2 lub 3 na kwarcie czystej, palec 5 na kwincie`;
   }
+  
   
   function descMaj() { return `Akord durowy — brzmi radośnie i jasno. Podstawa harmonii klasycznej.`; }
   function descMin() { return `Akord molowy — brzmi melancholijnie i poważnie.`; }

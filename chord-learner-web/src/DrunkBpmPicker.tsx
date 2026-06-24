@@ -33,6 +33,8 @@ function spawnDigit(id: number, w: number, h: number, fixedDigit?: number): Flyi
   };
 }
 
+
+
 function clampBpm(raw: number): number {
   if (isNaN(raw)) return 40;
   return Math.min(220, Math.max(40, raw));

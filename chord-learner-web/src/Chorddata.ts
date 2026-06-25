@@ -36,7 +36,6 @@ export interface ChordInfo {
   }
   
 
-  
   function descMaj() { return `Akord durowy — brzmi radośnie i jasno. Podstawa harmonii klasycznej.`; }
   function descMin() { return `Akord molowy — brzmi melancholijnie i poważnie.`; }
   function desc7()   { return `Dominantoseptymowy — napięty, prowadzi do rozwiązania. Często w bluesie i jazzie.`; }
